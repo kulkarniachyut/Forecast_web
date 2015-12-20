@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head> 
+  <title>Forecast Weather using Forecast.Io</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" integrity="sha384-aUGj/X2zp5rLCbBxumKTCw2Z50WgIr1vs/PFN4praOTvYXWlVyh2UtNUU0KAUhAX" crossorigin="anonymous">
+     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.14.0/jquery.validate.min.js"></script>
+    <script src="http://openweathermap.org/js/OWM.OpenLayers.1.3.4.js" ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.14.0/jquery.validate.js"></script>
+    <script src="http://openlayers.org/api/OpenLayers.js"> </script>
+    <script src="http://openweathermap.org/js/OWM.OpenLayers.1.3.4.js" ></script>
+    <script src="http://openlayers.org/api/OpenLayers.js"> </script>
+
+
+
+<style>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+   
+@media(max-width:767px){
+        .nxt7css {
+                margin: 5px 0px;
+        }
+}
+@media(min-width:768px){
+        .nxt7css {
+                margin: 5px 0px;
+        }
+}
+@media(min-width:992px){
+        .nxt7css {
+                margin: 10px 5px;
+        }
+}
+@media(min-width:1200px){
+        .nxt7css {
+                margin: 10px 5px;
+        }
+}
+
+
+.trans {
+
+background: rgba(0,0,0,.3);
+border-color:rgba(220, 220, 220, 0);
+opacity: 1;
+height: block;
+
+
+}
+
+
+#location_map {
+
+
+height : 428px;
+margin: 0;
+padding: 0;
+
+
+}
+
+#next24HourTable{
+    text-align: center;
+}
+#current_display {
+
+margin: 0;
+padding: 0;
+
+}
+
+        #ast{
+            color: red;
+        }
+        #label{
+            color: white;
+        }
+        .err{
+            color: red;
+        }
+#messages{
+            color:red;
+        }
+        label.error{
+            color: red;
+        }
+
+    </style>
+    <script>
+
+
+
+$(function() {
+
+$("#reset").click(function() {
+$("#address").val("");
+$("#city").val("");
+$("#state").val("");
+$("#strerr").html("");
+$("#cityerr").html("");
+$("#stateerr").html("");
+$("#displaytab").html("");
+var selectedVal = "";
+var selected = $('input:radio[name="degree"]:checked');
+selectedVal = selected.val();
+$('input:radio[name="degree"]')[0].checked = true;
+
+    validator.resetForm();
+});
+});
+
+  $(document).ready(function () {
+
+  
+validator=$('#weather').validate({
+    rules: {
+        address: {
+                                               required: {
+                                                       
+                                                               return true;
+                                                       }
+                                                               }
+                                       },
+    city: {
+                                               required: {
+                                                      
+                                                               return true;
+                                                       }
+                                                               }
+                                       },
+        state: {
+                    required: true
+                }
+  },
+  messages: {
+            address: {
+        required:"Please enter the street address"
+      },
+      city: {
+        required:"Please enter a city"
+      },
+      state: {
+                    required: "Please select a state"
+                }
+     
+      }
+        });
+  });
+     
+
+
+
+$(function() {
+
+
+$("#search").click(function() {
+
+
+var stradr = $("#address").val();
+ var city = $("#city").val();
+ var state = $("#state").val();
+var reg=/[^\s]/;
+
+            if(!$("#weather").valid())
+                {
+
+                    return false;
+                }
+            else
+                {
+                                      console.log("Inside the ajax call");
+                        $.ajax({
+//                                        url: 'http://achi-env.elasticbeanstalk.com/',
+                                        url : homework8_new.php ,
+                                        data: {
+                                                street : $("#address").val(),
+                                                city : $("#city").val(),
+                                                state : $("#state").val(),
+                                                degree : $("input[name=degree]:checked").val()
+                                        },
+                                        type: 'GET',
+                                        dataType: 'json',
+                                        success: function(json_response){
+                                                 address = $("#city").val() + " ," + $("#state").val();
+                                                 
+                                                 current_summary = json_response.currently.summary;
+                                                 temp = json_response.currently.temperature;
+                                                 temp_unit = $("input[name=degree]:checked").val();
+                                                 degree = "&deg";
+                                                
+                                                console.log("Inside the success function");
+                                                console.log(json_response);
+                                                 $('#forecastResult').show();
+ image_current = "";
+                                                switch(json_response.currently.icon)
+                                                {
+                                                        case 'clear-day': image_current="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/clear.png' title='clear day' length='100' width='100'>"; 
+                                                        weather_image = "http://cs-server.usc.edu:45678/hw/hw8/images/clear.png";break;
+                                                        case 'clear-night': image_current="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/clear_night.png' title='clear night' length='100' width='100'>";
+                                                        weather_image = "http://cs-server.usc.edu:45678/hw/hw8/images/clear_night.png";break;
+                                                        case 'rain': image_current="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/rain.png' title='clear day' length='100' width='100'>"; 
+                                                        weather_image = "http://cs-server.usc.edu:45678/hw/hw8/images/rain.png";break;
+                                                        case 'snow': image_current="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/snow.png' title='clear day' length='125' width='125'>";
+                                                        weather_image = "http://cs-server.usc.edu:45678/hw/hw8/images/snow.png";break;
+                                                        case 'sleet': image_current="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/sleet.png' title='clear day' length='125' width='125'>"; 
+                                                        weather_image = "http://cs-server.usc.edu:45678/hw/hw8/images/sleet.png";break;
+                                                        case 'wind': image_current="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/wind.png' title='clear day' length='125' width='125'>"; 
+                                                        weather_image = "http://cs-server.usc.edu:45678/hw/hw8/images/wind.png";break;
+                                                        case 'fog':     image_current="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/fog.png' title='clear day' length='125' width='125'>";
+                                                        weather_image = "http://cs-server.usc.edu:45678/hw/hw8/images/fog.png";break;
+                                                        case 'cloudy': image_current="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/cloudy.png' title='clear day' length='125' width='125'>"; 
+                                                        weather_image = "http://cs-server.usc.edu:45678/hw/hw8/images/cloudy.png";break;
+                                                        case 'partly-cloudy-day': image_current="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/cloud_day.png' title='mostly cloudy' length='125' width='125'>"; 
+                                                        weather_image = "http://cs-server.usc.edu:45678/hw/hw8/images/cloud_day.png";break;
+                                                        case 'partly-cloudy-night':     image_current="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/cloud_night.png' title='clear day' length='125' width='125'>";
+                                                        weather_image = "http://cs-server.usc.edu:45678/hw/hw8/images/cloud_night.png";break;
+                                                }
+//                                            weather_image = "http://cs-server.usc.edu:45678/hw/hw8/images/clear_night.png" ;
+if($('input[name=degree]:checked').val() == "Fahrenheit") {
+                                                        console.log($('input[name=degree]:checked').val());
+
+var precipIntensityF = "";
+                                                        if(json_response.currently.precipIntensity >= 0 && json_response.currently.precipIntensity < 0.002) precipIntensityF = "None";
+                                                        else if(json_response.currently.precipIntensity >= 0.002 && json_response.currently.precipIntensity < 0.017) precipIntensityF = "Very Light";
+                                                        else if(json_response.currently.precipIntensity >= 0.017 && json_response.currently.precipIntensity < 0.1) precipIntensityF = "Light";
+                                                        else if(json_response.currently.precipIntensity >= 0.1 && json_response.currently.precipIntensity < 0.4) precipIntensityF = "Moderate";
+                                                        else if(json_response.currently.precipIntensity >= 0.4) precipIntensityF = "Heavy";
+
+var time = json_response.daily.data[0].sunriseTime;
+var time1 = json_response.daily.data[0].sunsetTime;
+console.log(time);
+
+
+
+$("#current_display").html(
+                                                                '<div class="row" style="background: #F17D7E">' +
+                                                                '<center>' +
+                                                                        '<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">' +
+                                                                                image_current +
+                                                                        '</div>' +
+                                                                        '<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">' +
+                                                                                '<span style="color: white;"><b>' + json_response.currently.summary + ' in ' + $("#city").val() +', '+ $("#state").val() + '</b></span><br><span style="color: white; font-size: 50px;"><b>' + Math.round(json_response.currently.temperature) +'<span style="font-size: 15px; vertical-align: text-top;">&deg F</span></b></span><br><span style="color: blue;">'+ 'L: ' + Math.round(json_response.daily.data[0].temperatureMin) + '&deg</span> | <span style="color: green"> H: '+ Math.round(json_response.daily.data[0].temperatureMax) + '&deg</span>&nbsp;&nbsp' + '<img src="http://cs-server.usc.edu:45678/hw/hw8/images/fb_icon.png" title="Facebook Post" length="40" width="40" onclick = '+fb_post()+'>' +'</div>'+
+                                                                        '</div>' +
+                                                                '</center>' +
+                                                                '<div>' +
+                                                                '<div class="row">' +
+                                                                        '<div class="table-responsive"><table class="table table-striped">'+
+                                                                                '<tr><td>Precipitation</td><td>' + precipIntensityF + '</td></tr>'+
+                                                                                '<tr style="background: #F1DDDD"><td>Chance of Rain</td><td>' + Math.round(json_response.currently.precipProbability * 100) + ' %</td></tr>'+
+                                                                                '<tr><td>Wind Speed</td><td>' + (json_response.currently.windSpeed).toFixed(2) + ' mph</td></tr>'+
+                                                                                '<tr style="background: #F1DDDD"><td>Dew Point</td><td>' + (json_response.currently.dewPoint).toFixed(2) + '&deg F</td></tr>'+
+                                                                                '<tr><td>Humidity</td><td>' + Math.round(json_response.currently.humidity * 100) + ' %</td></tr>'+
+                                                                                '<tr style="background: #F1DDDD"><td>Visibility</td><td>' + (json_response.currently.visibility).toFixed(2) + ' mi</td></tr>'+
+                                                                                '<tr><td>Sunrise</td><td>' + format_time(json_response.daily.data[0].sunriseTime) + '</td></tr>'+
+                                                                                '<tr style="background: #F1DDDD"><td>Sunset</td><td>' + format_time(json_response.daily.data[0].sunsetTime) + '</td></tr>'+
+                                                                        '</table></div>' +
+                                                                '</div>'
+                                                        );
+
+
+
+
+$("#current_map").html(createMap(json_response.latitude, json_response.longitude));
+
+
+var next24hrs_display = '<div class="table-responsive"><table class="table table-striped" id="next24HourTable"><tr style="background-color:#367DB5; text-align:center" id="next24HourTableHeaderRow"><th style="color: white;text-align:center">Time</th><th style="color: white;text-align:center">Summary</th><th style="color: white;text-align:center">Cloud Cover</th><th style="color: white;text-align:center">Temp (&degF)</th><th style="color: white;text-align:center">View Details</th></tr>';
+                                                        for(var i = 1; i < 25; i++) {
+                                                                console.log(i);
+
+                                                                var image_24hour = "";
+                                                                switch(json_response.hourly.data[i].icon)
+                                                                {
+                                                                        case 'clear-day': image_24hour="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/clear.png' title='" + json_response.hourly.data[i].summary + "' alt='"+ json_response.hourly.data[i].summary +"' length='30' width='30'>";       break;
+                                                                        case 'clear-night': image_24hour="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/clear_night.png' title='" + json_response.hourly.data[i].summary + "' alt='"+ json_response.hourly.data[i].summary +"' length='30' width='30'>"; break;
+                                                                        case 'rain': image_24hour="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/rain.png' title='" + json_response.hourly.data[i].summary + "' alt='"+ json_response.hourly.data[i].summary +"' length='30' width='30'>"; break;
+                                                                        case 'snow': image_24hour="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/snow.png' title='" + json_response.hourly.data[i].summary + "' alt='"+ json_response.hourly.data[i].summary +"' length='30' width='30'>"; break;
+                                                                        case 'sleet': image_24hour="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/sleet.png' title='" + json_response.hourly.data[i].summary + "' alt='"+ json_response.hourly.data[i].summary +"' length='30' width='30'>"; break;
+                                                                        case 'wind': image_24hour="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/wind.png' title='" + json_response.hourly.data[i].summary + "' alt='"+ json_response.hourly.data[i].summary +"' length='30' width='30'>"; break;
+                                                                        case 'fog':     image_24hour="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/fog.png' title='" + json_response.hourly.data[i].summary + "' alt='"+ json_response.hourly.data[i].summary +"' length='30' width='30'>"; break;
+                                                                        case 'cloudy': image_24hour="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/cloudy.png' title='" + json_response.hourly.data[i].summary + "' alt='"+ json_response.hourly.data[i].summary +"' length='30' width='30'>"; break;
+                                                                        case 'partly-cloudy-day': image_24hour="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/cloud_day.png' title='" + json_response.hourly.data[i].summary + "' alt='"+ json_response.hourly.data[i].summary +"' length='30' width='30'>"; break;
+                                                                        case 'partly-cloudy-night':     image_24hour="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/cloud_night.png' title='" + json_response.hourly.data[i].summary + "' alt='"+ json_response.hourly.data[i].summary +"' length='30' width='30'>"; break;      
+                                                                }
+
+                                                                next24hrs_display += '<tr style="background: white;"><td>' + format_time(json_response.hourly.data[i].time) + '</td><td>' + image_24hour + '</td><td>' + (json_response.hourly.data[i].cloudCover * 100).toFixed(0) + '%</td><td>' + json_response.hourly.data[i].temperature + '</td><td><span class="glyphicon glyphicon-plus" style="color: #3071A9" data-toggle="collapse" data-target="#viewDetail'+ i +'" aria-expanded="false" aria-controls="viewDetail'+ i +'" aria-hidden="true"></span></td></tr>';
+                                                                next24hrs_display += '<tr style="background: #F9F9F9;" class="collapse" id="viewDetail'+ i +'"><td colspan="5">';
+                                                                next24hrs_display += '<div class="table-responsive"><table class="table table-striped"><tr style="background: white;"><th style="text-align:center;">Wind</th><th style="text-align:center;">Humidity</th><th style="text-align:center;">Visibility</th><th style="text-align:center;">Pressure</th></tr>';
+                                                                next24hrs_display += '<tr style="background: #F9F9F9;"><td style="text-align:center;">' + (json_response.hourly.data[i].windSpeed).toFixed(2) + 'mph</td><td style="text-align:center;">' + Math.round(json_response.hourly.data[i].humidity * 100) + '%</td><td style="text-align:center;">' + (json_response.hourly.data[i].visibility).toFixed(2) + 'mi</td><td style="text-align:center;">' + json_response.hourly.data[i].pressure + 'mb</td></tr>';
+                                                                next24hrs_display += '</table></div>';
+                                                                next24hrs_display += '</td></tr>';
+                                                        }
+                                                        next24hrs_display += '</table></div>';
+                                                        $("#tab2Visual").html(next24hrs_display);
+
+
+
+
+var seven_days = "";
+                                                        seven_days += '<div class="col-xs-12 col-sm-12 col-md-1 col-lg-1"></div><div class="col-xs-12 col-sm-12 col-md-1 col-lg-1"></div>'
+                                                        for(var j = 1; j < 8; j++) {
+
+                                                                var image_sevendays = "";
+                                                                switch(json_response.daily.data[j].icon)
+                                                                {
+                                                                       
+                                                                        case 'cloudy': image_sevendays="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/cloudy.png' title='"+ json_response.daily.data[j].summary +"' alt='"+ json_response.daily.data[j].summary +"' length='30' width='30'>"; break;
+                                                                        case 'partly-cloudy-day': image_sevendays="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/cloud_day.png' title='"+ json_response.daily.data[j].summary +"' alt='"+ json_response.daily.data[j].summary +"' length='30' width='30'>"; break;
+                                                                        case 'partly-cloudy-night':     image_sevendays="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/cloud_night.png' title='"+ json_response.daily.data[j].summary +"' alt='"+ json_response.daily.data[j].summary +"' length='30' width='30'>"; break;
+                                                                }
+
+                                                                var image_sevendaysModal = "";
+                                                                switch(json_response.daily.data[j].icon)
+                                                                {
+                                                                        case 'clear-day': image_sevendaysModal="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/clear.png' title='"+ json_response.daily.data[j].summary +"' alt='"+ json_response.daily.data[j].summary +"' length='125' width='125'>";     break;
+                                                                        case 'clear-night': image_sevendaysModal="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/clear_night.png' title='"+ json_response.daily.data[j].summary +"' alt='"+ json_response.daily.data[j].summary +"' length='125' width='125'>"; break;
+                                                                        case 'rain': image_sevendaysModal="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/rain.png' title='"+ json_response.daily.data[j].summary +"' alt='"+ json_response.daily.data[j].summary +"' length='125' width='125'>"; break;
+                                                                        case 'snow': image_sevendaysModal="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/snow.png' title='"+ json_response.daily.data[j].summary +"' alt='"+ json_response.daily.data[j].summary +"' length='125' width='125'>"; break;
+                                                                        case 'sleet': image_sevendaysModal="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/sleet.png' title='"+ json_response.daily.data[j].summary +"' alt='"+ json_response.daily.data[j].summary +"' length='125' width='125'>"; break;
+                                                                        case 'wind': image_sevendaysModal="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/wind.png' title='"+ json_response.daily.data[j].summary +"' alt='"+ json_response.daily.data[j].summary +"' length='125' width='125'>"; break;
+                                                                        case 'fog':     image_sevendaysModal="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/fog.png' title='"+ json_response.daily.data[j].summary +"' alt='"+ json_response.daily.data[j].summary +"' length='125' width='125'>"; break;
+                                                                        case 'cloudy': image_sevendaysModal="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/cloudy.png' title='"+ json_response.daily.data[j].summary +"' alt='"+ json_response.daily.data[j].summary +"' length='125' width='125'>"; break;
+                                                                        case 'partly-cloudy-day': image_sevendaysModal="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/cloud_day.png' title='"+ json_response.daily.data[j].summary +"' alt='"+ json_response.daily.data[j].summary +"' length='125' width='125'>"; break;
+                                                                        case 'partly-cloudy-night':     image_sevendaysModal="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/cloud_night.png' title='"+ json_response.daily.data[j].summary +"' alt='"+ json_response.daily.data[j].summary +"' length='125' width='125'>"; break;    
+                                                                }
+
+                                                                var visibility7Days = "N.A.";
+                                                                if (json_response.daily.data[j].visibility != undefined) {
+                                                                        visibility7Days = (json_response.daily.data[j].visibility).toFixed(2) + 'mi';
+                                                                }
+                                                                if(j==1){
+                                                                    seven_days += '<div class="col-xs-12 col-sm-12 col-md-1 col-lg-1 nxt7css" style="border-radius: 5px; padding-left: 0; padding-right:0;background-color:#367DB5;" id="next7Hours'+ j +'" data-toggle="modal" data-target="#myModal'+j+'"><center>' + '<span style="color: white; font-size:13px;"><b>' + get_time(json_response.daily.data[j].time)+ '</b></span>' +'<br><br><span style="color: white; font-size:13px;"><b>'+ time_month_get(json_response.daily.data[j].time) +'</b></span><br><br>'+ image_sevendays +'<br><br><span style="color: white; font-size:13px;"> Min <br> Temp </span><br><br><span style="color: white; font-size:20px;"><b>'+ json_response.daily.data[j].temperatureMin +'&deg</span><br><br><span style="color: white; font-size:13px;"> Max <br> Temp </span><br><br><span style="color: white; font-size:20px;"><b>'+ json_response.daily.data[j].temperatureMax + '&deg</b></span></center></div>';
+
+                                                                }
+                                                                else if(j==2){
+                                                                    seven_days += '<div class="col-xs-12 col-sm-12 col-md-1 col-lg-1 nxt7css" style="border-radius: 5px; padding-left: 0; padding-right:0;background-color:#EC4444;" id="next7Hours'+ j +'" data-toggle="modal" data-target="#myModal'+j+'"><center>' + '<span style="color: white; font-size:13px;"><b>' + get_time(json_response.daily.data[j].time)+ '</b></span>' +'<br><br><span style="color: white; font-size:13px;"><b>'+ time_month_get(json_response.daily.data[j].time) +'</b></span><br><br>'+ image_sevendays +'<br><br><span style="color: white; font-size:13px;"> Min <br> Temp </span><br><br><span style="color: white; font-size:20px;"><b>'+ json_response.daily.data[j].temperatureMin +'&deg</span><br><br><span style="color: white; font-size:13px;"> Max <br> Temp </span><br><br><span style="color: white; font-size:20px;"><b>'+ json_response.daily.data[j].temperatureMax + '&deg</b></span></center></div>';
+
+                                                                }
+                                                                 else if(j==3){
+                                                                    seven_days += '<div class="col-xs-12 col-sm-12 col-md-1 col-lg-1 nxt7css" style="border-radius: 5px; padding-left: 0; padding-right:0;background-color:#E68E4F;" id="next7Hours'+ j +'" data-toggle="modal" data-target="#myModal'+j+'"><center>' + '<span style="color: white; font-size:13px;"><b>' + get_time(json_response.daily.data[j].time)+ '</b></span>' +'<br><br><span style="color: white; font-size:13px;"><b>'+ time_month_get(json_response.daily.data[j].time) +'</b></span><br><br>'+ image_sevendays +'<br><br><span style="color: white; font-size:13px;"> Min <br> Temp </span><br><br><span style="color: white; font-size:20px;"><b>'+ json_response.daily.data[j].temperatureMin +'&deg</span><br><br><span style="color: white; font-size:13px;"> Max <br> Temp </span><br><br><span style="color: white; font-size:20px;"><b>'+ json_response.daily.data[j].temperatureMax + '&deg</b></span></center></div>';
+
+                                                                }
+                                                                else if(j==4){
+                                                                    seven_days += '<div class="col-xs-12 col-sm-12 col-md-1 col-lg-1 nxt7css" style="border-radius: 5px; padding-left: 0; padding-right:0;background-color:#A7A439;" id="next7Hours'+ j +'" data-toggle="modal" data-target="#myModal'+j+'"><center>' + '<span style="color: white; font-size:13px;"><b>' + get_time(json_response.daily.data[j].time)+ '</b></span>' +'<br><br><span style="color: white; font-size:13px;"><b>'+ time_month_get(json_response.daily.data[j].time) +'</b></span><br><br>'+ image_sevendays +'<br><br><span style="color: white; font-size:13px;"> Min <br> Temp </span><br><br><span style="color: white; font-size:20px;"><b>'+ json_response.daily.data[j].temperatureMin +'&deg</span><br><br><span style="color: white; font-size:13px;"> Max <br> Temp </span><br><br><span style="color: white; font-size:20px;"><b>'+ json_response.daily.data[j].temperatureMax + '&deg</b></span></center></div>';
+
+                                                                }
+                                                                else if(j==5){
+                                                                    seven_days += '<div class="col-xs-12 col-sm-12 col-md-1 col-lg-1 nxt7css" style="border-radius: 5px; padding-left: 0; padding-right:0;background-color:#9770A7;" id="next7Hours'+ j +'" data-toggle="modal" data-target="#myModal'+j+'"><center>' + '<span style="color: white; font-size:13px;"><b>' + get_time(json_response.daily.data[j].time)+ '</b></span>' +'<br><br><span style="color: white; font-size:13px;"><b>'+ time_month_get(json_response.daily.data[j].time) +'</b></span><br><br>'+ image_sevendays +'<br><br><span style="color: white; font-size:13px;"> Min <br> Temp </span><br><br><span style="color: white; font-size:20px;"><b>'+ json_response.daily.data[j].temperatureMin +'&deg</span><br><br><span style="color: white; font-size:13px;"> Max <br> Temp </span><br><br><span style="color: white; font-size:20px;"><b>'+ json_response.daily.data[j].temperatureMax + '&deg</b></span></center></div>';
+
+                                                                }
+                                                                else if(j==6){
+                                                                    seven_days += '<div class="col-xs-12 col-sm-12 col-md-1 col-lg-1 nxt7css" style="border-radius: 5px; padding-left: 0; padding-right:0;background-color:#F37C7E;" id="next7Hours'+ j +'" data-toggle="modal" data-target="#myModal'+j+'"><center>' + '<span style="color: white; font-size:13px;"><b>' + get_time(json_response.daily.data[j].time)+ '</b></span>' +'<br><br><span style="color: white; font-size:13px;"><b>'+ time_month_get(json_response.daily.data[j].time) +'</b></span><br><br>'+ image_sevendays +'<br><br><span style="color: white; font-size:13px;"> Min <br> Temp </span><br><br><span style="color: white; font-size:20px;"><b>'+ json_response.daily.data[j].temperatureMin +'&deg</span><br><br><span style="color: white; font-size:13px;"> Max <br> Temp </span><br><br><span style="color: white; font-size:20px;"><b>'+ json_response.daily.data[j].temperatureMax + '&deg</b></span></center></div>';
+
+                                                                }
+                                                                else if(j==7){
+                                                                seven_days += '<div class="col-xs-12 col-sm-12 col-md-1 col-lg-1 nxt7css" style="border-radius: 5px; padding-left: 0; padding-right:0;background-color:#CE4571;" id="next7Hours'+ j +'" data-toggle="modal" data-target="#myModal'+j+'"><center>' + '<span style="color: white; font-size:13px;"><b>' + get_time(json_response.daily.data[j].time)+ '</b></span>' +'<br><br><span style="color: white; font-size:13px;"><b>'+ time_month_get(json_response.daily.data[j].time) +'</b></span><br><br>'+ image_sevendays +'<br><br><span style="color: white; font-size:13px;"> Min <br> Temp </span><br><br><span style="color: white; font-size:20px;"><b>'+ json_response.daily.data[j].temperatureMin +'&deg</span><br><br><span style="color: white; font-size:13px;"> Max <br> Temp </span><br><br><span style="color: white; font-size:20px;"><b>'+ json_response.daily.data[j].temperatureMax + '&deg</b></span></center></div>';
+                                                            }
+                                                                seven_days += '<div class="modal fade" id="myModal'+j+'" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">';
+                                                                seven_days +=   '<div class="modal-dialog" role="document">';
+                                                                seven_days +=      '<div class="modal-content">';
+                                                                seven_days +=        '<div class="modal-header">';
+                                                                seven_days +=              '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+                                                                seven_days +=              '<h4 class="modal-title" id="myModalLabel">Weather in '+ $("#city").val() + ' on ' + time_month_get(json_response.daily.data[j].time) +'</h4>';
+                                                                seven_days +=        '</div>';
+                                                                seven_days +=        '<div class="modal-body">';
+                                                                seven_days +=              '<center>' + image_sevendaysModal + '<br><span style="font-size: 30px;">' + get_time(json_response.daily.data[j].time) + ': <span style="color: FFA500;">' + json_response.daily.data[j].summary + '</span></span></center>';
+                                                                seven_days +=      '<div class="row">';
+                                                                seven_days +=              '<center>';
+                                                                seven_days +=                      '<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">';
+                                                                seven_days +=                              '<span style="font-size: 20px;"><b> Sunrise Time </b></span><br><span>' + format_time(json_response.daily.data[j].sunriseTime) + '</span>';
+                                                                seven_days +=                      '</div>';
+                                                                seven_days +=                      '<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">';
+                                                                seven_days +=                              '<span style="font-size: 20px;"><b> Sunset Time </b></span><br><span>' + format_time(json_response.daily.data[j].sunsetTime) + '</span>';
+                                                                seven_days +=                      '</div>';
+                                                                seven_days +=                      '<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">';
+                                                                seven_days +=                              '<span style="font-size: 20px;"><b> Humidity </b></span><br><span>' + Math.round(json_response.daily.data[j].humidity * 100) + '%</span>';
+                                                                seven_days +=                      '</div>';
+                                                                seven_days +=              '</center>';
+                                                                seven_days +=              '</div>';
+                                                                seven_days +=              '<div class="row">';
+                                                                seven_days +=              '<center>';
+                                                                seven_days +=                      '<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">';
+                                                                seven_days +=                              '<span style="font-size: 20px;"><b> Wind Speed </b></span><br><span>' + (json_response.daily.data[j].windSpeed).toFixed(2) + 'mph</span>';
+                                                                seven_days +=                      '</div>';
+                                                                seven_days +=                      '<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">';
+                                                                seven_days +=                              '<span style="font-size: 20px;"><b> Visibility </b></span><br><span>' + visibility7Days + '</span>';
+                                                                seven_days +=                      '</div>';
+                                                                seven_days +=                      '<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">';
+                                                                seven_days +=                              '<span style="font-size: 20px;"><b> Pressure </b></span><br><span>' + json_response.daily.data[j].pressure + 'mb</span>';
+                                                                seven_days +=                      '</div>';
+                                                                seven_days +=              '</center>';
+                                                                seven_days +=              '</div>';
+                                                                seven_days +=        '</div>';
+                                                                seven_days +=        '<div class="modal-footer">';
+                                                                seven_days +=              '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>';
+                                                                seven_days +=        '</div>';
+                                                                seven_days +=      '</div>';
+                                                                seven_days +=   '</div>';
+                                                                seven_days += '</div>';
+                                                        }
+                                                        seven_days += '<div class="col-xs-12 col-sm-12 col-md-1 col-lg-1"></div><div class="col-xs-12 col-sm-12 col-md-1 col-lg-1"></div><div class="col-xs-12 col-sm-12 col-md-1 col-lg-1"></div>';
+                                                        $("#seven_days").html(seven_days);
+                                                }
+
+
+
+
+
+if($('input[name=degree]:checked').val() == "Celsius") {
+                                                        console.log($('input[name=degree]:checked').val())
+
+                                                        var precipIntensityC = "";
+                                                        var ocp = (json_response.currently.precipIntensity / 25.4)
+                                                        if(ocp >= 0 && ocp < 0.002) precipIntensityC = "None";
+                                                        else if(ocp >= 0.002 && ocp < 0.017) precipIntensityC = "Very Light";
+                                                        else if(ocp >= 0.017 && ocp < 0.1) precipIntensityC = "Light";
+                                                        else if(ocp >= 0.1 && ocp < 0.4) precipIntensityC = "Moderate";
+                                                        else if(ocp >= 0.4) precipIntensityC = "Heavy";
+
+                                                        $('#current_display').html(
+                                                                '<div class="row" style="background: #F17D7E">' +
+                                                                '<center>' +
+                                                                        '<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">' +
+                                                                                image_current +
+                                                                        '</div>' +
+                                                                        '<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">' +
+                                                                                '<span style="color: white;"><b>' + json_response.currently.summary + ' in ' + $("#city").val() +', '+ $("#state").val() + '</b></span><br><span style="color: white; font-size: 50px;"><b>' + Math.round(json_response.currently.temperature) +'<span style="font-size: 15px; vertical-align: text-top;">&deg C</span></b></span><br><span style="color: blue;">'+ 'L: ' + Math.round(json_response.daily.data[0].temperatureMin) + '&deg</span> | <span style="color: green"> H: '+ Math.round(json_response.daily.data[0].temperatureMax) + '&deg</span>&nbsp;&nbsp' + '<img src="http://cs-server.usc.edu:45678/hw/hw8/images/fb_icon.png" title="Facebook Post" length="40" width="40" >' +'</div>'+
+                                                                        '</div>' +
+                                                                '</center>' +
+                                                                '<div>' +
+                                                                '<div class="row">' +
+                                                                        '<div class="table-responsive"><table class="table table-striped">'+
+                                                                                '<tr><td>Precipitation</td><td>' + precipIntensityC + '</td></tr>'+
+                                                                                '<tr style="background: #F1DDDD"><td>Chance of Rain</td><td>' + Math.round(json_response.currently.precipProbability * 100) + ' %</td></tr>'+
+                                                                                '<tr><td>Wind Speed</td><td>' + (json_response.currently.windSpeed).toFixed(2) + ' m/s</td></tr>'+
+                                                                                '<tr style="background: #F1DDDD"><td>Dew Point</td><td>' + (json_response.currently.dewPoint).toFixed(2) + '&deg C</td></tr>'+
+                                                                                '<tr><td>Humidity</td><td>' + Math.round(json_response.currently.humidity * 100) + ' %</td></tr>'+
+                                                                                '<tr style="background: #F1DDDD"><td>Visibility</td><td>' + (json_response.currently.visibility).toFixed(2) + ' km</td></tr>'+
+                                                                                '<tr><td>Sunrise</td><td>' + format_time(json_response.daily.data[0].sunriseTime) + '</td></tr>'+
+                                                                                '<tr style="background: #F1DDDD"><td>Sunset</td><td>' + format_time(json_response.daily.data[0].sunsetTime) + '</td></tr>'+
+                                                                        '</table></div>' +
+                                                                '</div>'
+                                                        );
+
+$("#current_map").html(createMap(json_response.latitude, json_response.longitude));
+
+
+
+var next24hrs_display = '<div class="table-responsive"><table class="table table-striped" id="next24HourTable"><tr style="background-color:#367DB5;" id="next24HourTableHeaderRow"><th style="color: white;text-align:center">Time</th><th style="color: white;text-align:center">Summary</th><th style="color: white;text-align:center">Cloud Cover</th><th style="color: white;text-align:center">Temp (&degC)</th><th style="color: white;text-align:center">View Details</th></tr>';
+                                                        for(var i = 1; i < 25; i++) {
+                                                                console.log(i);
+
+                                                                var image_24hour = "";
+                                                                switch(json_response.hourly.data[i].icon)
+                                                                {
+                                                                        case 'clear-day': image_24hour="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/clear.png' title='" + json_response.hourly.data[i].summary + "' alt='"+ json_response.hourly.data[i].summary +"' length='30' width='30'>";       break;
+                                                                        case 'clear-night': image_24hour="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/clear_night.png' title='" + json_response.hourly.data[i].summary + "' alt='"+ json_response.hourly.data[i].summary +"' length='30' width='30'>"; break;
+                                                                        case 'rain': image_24hour="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/rain.png' title='" + json_response.hourly.data[i].summary + "' alt='"+ json_response.hourly.data[i].summary +"' length='30' width='30'>"; break;
+                                                                        case 'snow': image_24hour="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/snow.png' title='" + json_response.hourly.data[i].summary + "' alt='"+ json_response.hourly.data[i].summary +"' length='30' width='30'>"; break;
+                                                                        case 'sleet': image_24hour="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/sleet.png' title='" + json_response.hourly.data[i].summary + "' alt='"+ json_response.hourly.data[i].summary +"' length='30' width='30'>"; break;
+                                                                        case 'wind': image_24hour="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/wind.png' title='" + json_response.hourly.data[i].summary + "' alt='"+ json_response.hourly.data[i].summary +"' length='30' width='30'>"; break;
+                                                                        case 'fog':     image_24hour="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/fog.png' title='" + json_response.hourly.data[i].summary + "' alt='"+ json_response.hourly.data[i].summary +"' length='30' width='30'>"; break;
+                                                                        case 'cloudy': image_24hour="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/cloudy.png' title='" + json_response.hourly.data[i].summary + "' alt='"+ json_response.hourly.data[i].summary +"' length='30' width='30'>"; break;
+                                                                        case 'partly-cloudy-day': image_24hour="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/cloud_day.png' title='" + json_response.hourly.data[i].summary + "' alt='"+ json_response.hourly.data[i].summary +"' length='30' width='30'>"; break;
+                                                                        case 'partly-cloudy-night':     image_24hour="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/cloud_night.png' title='" + json_response.hourly.data[i].summary + "' alt='"+ json_response.hourly.data[i].summary +"' length='30' width='30'>"; break;      
+                                                                }
+
+                                                                next24hrs_display += '<tr style="background: white;"><td>' + format_time(json_response.hourly.data[i].time) + '</td><td>' + image_24hour + '</td><td>' + (json_response.hourly.data[i].cloudCover * 100).toFixed(0) + '%</td><td>' + json_response.hourly.data[i].temperature + '</td><td><span class="glyphicon glyphicon-plus" style="color: #3071A9" data-toggle="collapse" data-target="#viewDetail'+ i +'" aria-expanded="false" aria-controls="viewDetail'+ i +'" aria-hidden="true"></span></td></tr>';
+                                                                next24hrs_display += '<tr style="background: #F9F9F9;" class="collapse" id="viewDetail'+ i +'"><td colspan="5">';
+                                                                next24hrs_display += '<div class="table-responsive"><table class="table table-striped"><tr style="background: white;"><th style="text-align:center">Wind</th><th style="text-align:center">Humidity</th><th style="text-align:center">Visibility</th><th style="text-align:center">Pressure</th></tr>';
+                                                                next24hrs_display += '<tr style="background: #F9F9F9;"><td style="text-align:center">' + (json_response.hourly.data[i].windSpeed).toFixed(2) + 'm/s</td><td style="text-align:center">' + Math.round(json_response.hourly.data[i].humidity * 100) + '%</td><td style="text-align:center">' + (json_response.hourly.data[i].visibility).toFixed(2) + 'km</td><td style="text-align:center">' + json_response.hourly.data[i].pressure + 'pa</td></tr>';
+                                                                next24hrs_display += '</table></div>';
+                                                                next24hrs_display += '</td></tr>';
+                                                        }
+                                                        next24hrs_display += '</table></div>';
+                                                        $("#tab2Visual").html(next24hrs_display);
+
+                                                        var seven_days = "";
+                                                        seven_days += '<div class="col-xs-12 col-sm-12 col-md-1 col-lg-1"></div><div class="col-xs-12 col-sm-12 col-md-1 col-lg-1"></div>'
+                                                        for(var j = 1; j < 8; j++) {
+
+                                                                var image_sevendays = "";
+                                                                switch(json_response.daily.data[j].icon)
+                                                                {
+                                                                        case 'clear-day': image_sevendays="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/clear.png' title='"+ json_response.daily.data[j].summary +"' alt='"+ json_response.daily.data[j].summary +"' length='30' width='30'>";    break;
+                                                                        case 'clear-night': image_sevendays="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/clear_night.png' title='"+ json_response.daily.data[j].summary +"' alt='"+ json_response.daily.data[j].summary +"' length='30' width='30'>"; break;
+                                                                        case 'rain': image_sevendays="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/rain.png' title='"+ json_response.daily.data[j].summary +"' alt='"+ json_response.daily.data[j].summary +"' length='30' width='30'>"; break;
+                                                                        case 'snow': image_sevendays="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/snow.png' title='"+ json_response.daily.data[j].summary +"' alt='"+ json_response.daily.data[j].summary +"' length='30' width='30'>"; break;
+                                                                        case 'sleet': image_sevendays="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/sleet.png' title='"+ json_response.daily.data[j].summary +"' alt='"+ json_response.daily.data[j].summary +"' length='30' width='30'>"; break;
+                                                                        case 'wind': image_sevendays="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/wind.png' title='"+ json_response.daily.data[j].summary +"' alt='"+ json_response.daily.data[j].summary +"' length='30' width='30'>"; break;
+                                                                        case 'fog':     image_sevendays="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/fog.png' title='"+ json_response.daily.data[j].summary +"' alt='"+ json_response.daily.data[j].summary +"' length='30' width='30'>"; break;
+                                                                        case 'cloudy': image_sevendays="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/cloudy.png' title='"+ json_response.daily.data[j].summary +"' alt='"+ json_response.daily.data[j].summary +"' length='30' width='30'>"; break;
+                                                                        case 'partly-cloudy-day': image_sevendays="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/cloud_day.png' title='"+ json_response.daily.data[j].summary +"' alt='"+ json_response.daily.data[j].summary +"' length='30' width='30'>"; break;
+                                                                        case 'partly-cloudy-night':     image_sevendays="<img src='http://cs-server.usc.edu:45678/hw/hw8/images/cloud_night.png' title='"+ json_response.daily.data[j].summary +"' alt='"+ json_response.daily.data[j].summary +"' length='30' width='30'>"; break;
+                                                                }
+
+                                                                var image_sevendaysModal = "";
+                                                               
+
+                                                                var visibility7Days = "N.A.";
+                                                                if (json_response.daily.data[j].visibility != undefined) {
+                                                                        visibility7Days = (json_response.daily.data[j].visibility).toFixed(2) + 'km';
+                                                                }
+                                                                if(j==1){
+                                                                    seven_days += '<div class="col-xs-12 col-sm-12 col-md-1 col-lg-1 nxt7css" style="border-radius: 5px; padding-left: 0; padding-right:0;background-color:#367DB5;" id="next7Hours'+ j +'" data-toggle="modal" data-target="#myModal'+j+'"><center>' + '<span style="color: white; font-size:13px;"><b>' + get_time(json_response.daily.data[j].time)+ '</b></span>' +'<br><br><span style="color: white; font-size:13px;"><b>'+ time_month_get(json_response.daily.data[j].time) +'</b></span><br><br>'+ image_sevendays +'<br><br><span style="color: white; font-size:13px;"> Min <br> Temp </span><br><br><span style="color: white; font-size:20px;"><b>'+ json_response.daily.data[j].temperatureMin +'&deg</span><br><br><span style="color: white; font-size:13px;"> Max <br> Temp </span><br><br><span style="color: white; font-size:20px;"><b>'+ json_response.daily.data[j].temperatureMax + '&deg</b></span></center></div>';
+                                                                }
+                                                                if(j==2){
+                                                                    seven_days += '<div class="col-xs-12 col-sm-12 col-md-1 col-lg-1 nxt7css" style="border-radius: 5px; padding-left: 0; padding-right:0;background-color:#EC4444;" id="next7Hours'+ j +'" data-toggle="modal" data-target="#myModal'+j+'"><center>' + '<span style="color: white; font-size:13px;"><b>' + get_time(json_response.daily.data[j].time)+ '</b></span>' +'<br><br><span style="color: white; font-size:13px;"><b>'+ time_month_get(json_response.daily.data[j].time) +'</b></span><br><br>'+ image_sevendays +'<br><br><span style="color: white; font-size:13px;"> Min <br> Temp </span><br><br><span style="color: white; font-size:20px;"><b>'+ json_response.daily.data[j].temperatureMin +'&deg</span><br><br><span style="color: white; font-size:13px;"> Max <br> Temp </span><br><br><span style="color: white; font-size:20px;"><b>'+ json_response.daily.data[j].temperatureMax + '&deg</b></span></center></div>';
+                                                                }
+                                                                if(j==3){
+                                                                    seven_days += '<div class="col-xs-12 col-sm-12 col-md-1 col-lg-1 nxt7css" style="border-radius: 5px; padding-left: 0; padding-right:0;background-color:#E68E4F;" id="next7Hours'+ j +'" data-toggle="modal" data-target="#myModal'+j+'"><center>' + '<span style="color: white; font-size:13px;"><b>' + get_time(json_response.daily.data[j].time)+ '</b></span>' +'<br><br><span style="color: white; font-size:13px;"><b>'+ time_month_get(json_response.daily.data[j].time) +'</b></span><br><br>'+ image_sevendays +'<br><br><span style="color: white; font-size:13px;"> Min <br> Temp </span><br><br><span style="color: white; font-size:20px;"><b>'+ json_response.daily.data[j].temperatureMin +'&deg</span><br><br><span style="color: white; font-size:13px;"> Max <br> Temp </span><br><br><span style="color: white; font-size:20px;"><b>'+ json_response.daily.data[j].temperatureMax + '&deg</b></span></center></div>';
+                                                                }
+                                                                if(j==4){
+                                                                    seven_days += '<div class="col-xs-12 col-sm-12 col-md-1 col-lg-1 nxt7css" style="border-radius: 5px; padding-left: 0; padding-right:0;background-color:#A7A439;" id="next7Hours'+ j +'" data-toggle="modal" data-target="#myModal'+j+'"><center>' + '<span style="color: white; font-size:13px;"><b>' + get_time(json_response.daily.data[j].time)+ '</b></span>' +'<br><br><span style="color: white; font-size:13px;"><b>'+ time_month_get(json_response.daily.data[j].time) +'</b></span><br><br>'+ image_sevendays +'<br><br><span style="color: white; font-size:13px;"> Min <br> Temp </span><br><br><span style="color: white; font-size:20px;"><b>'+ json_response.daily.data[j].temperatureMin +'&deg</span><br><br><span style="color: white; font-size:13px;"> Max <br> Temp </span><br><br><span style="color: white; font-size:20px;"><b>'+ json_response.daily.data[j].temperatureMax + '&deg</b></span></center></div>';
+                                                                }
+                                                                if(j==5){
+                                                                    seven_days += '<div class="col-xs-12 col-sm-12 col-md-1 col-lg-1 nxt7css" style="border-radius: 5px; padding-left: 0; padding-right:0;background-color:#9770A7;" id="next7Hours'+ j +'" data-toggle="modal" data-target="#myModal'+j+'"><center>' + '<span style="color: white; font-size:13px;"><b>' + get_time(json_response.daily.data[j].time)+ '</b></span>' +'<br><br><span style="color: white; font-size:13px;"><b>'+ time_month_get(json_response.daily.data[j].time) +'</b></span><br><br>'+ image_sevendays +'<br><br><span style="color: white; font-size:13px;"> Min <br> Temp </span><br><br><span style="color: white; font-size:20px;"><b>'+ json_response.daily.data[j].temperatureMin +'&deg</span><br><br><span style="color: white; font-size:13px;"> Max <br> Temp </span><br><br><span style="color: white; font-size:20px;"><b>'+ json_response.daily.data[j].temperatureMax + '&deg</b></span></center></div>';
+                                                                }
+                                                                if(j==6){
+                                                                    seven_days += '<div class="col-xs-12 col-sm-12 col-md-1 col-lg-1 nxt7css" style="border-radius: 5px; padding-left: 0; padding-right:0;background-color:#F37C7E;" id="next7Hours'+ j +'" data-toggle="modal" data-target="#myModal'+j+'"><center>' + '<span style="color: white; font-size:13px;"><b>' + get_time(json_response.daily.data[j].time)+ '</b></span>' +'<br><br><span style="color: white; font-size:13px;"><b>'+ time_month_get(json_response.daily.data[j].time) +'</b></span><br><br>'+ image_sevendays +'<br><br><span style="color: white; font-size:13px;"> Min <br> Temp </span><br><br><span style="color: white; font-size:20px;"><b>'+ json_response.daily.data[j].temperatureMin +'&deg</span><br><br><span style="color: white; font-size:13px;"> Max <br> Temp </span><br><br><span style="color: white; font-size:20px;"><b>'+ json_response.daily.data[j].temperatureMax + '&deg</b></span></center></div>';
+                                                                }
+                                                                if(j==7){
+                                                                seven_days += '<div class="col-xs-12 col-sm-12 col-md-1 col-lg-1 nxt7css" style="border-radius: 5px; padding-left: 0; padding-right:0;background-color:#CE4571;" id="next7Hours'+ j +'" data-toggle="modal" data-target="#myModal'+j+'"><center>' + '<span style="color: white; font-size:13px;"><b>' + get_time(json_response.daily.data[j].time)+ '</b></span>' +'<br><br><span style="color: white; font-size:13px;"><b>'+ time_month_get(json_response.daily.data[j].time) +'</b></span><br><br>'+ image_sevendays +'<br><br><span style="color: white; font-size:13px;"> Min <br> Temp </span><br><br><span style="color: white; font-size:20px;"><b>'+ json_response.daily.data[j].temperatureMin +'&deg</span><br><br><span style="color: white; font-size:13px;"> Max <br> Temp </span><br><br><span style="color: white; font-size:20px;"><b>'+ json_response.daily.data[j].temperatureMax + '&deg</b></span></center></div>';
+                                                            }
+                                                                seven_days += '<div class="modal fade" id="myModal'+j+'" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">';
+                                                                seven_days +=   '<div class="modal-dialog" role="document">';
+                                                                seven_days +=      '<div class="modal-content">';
+                                                                seven_days +=        '<div class="modal-header">';
+                                                                seven_days +=              '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+                                                                seven_days +=              '<h4 class="modal-title" id="myModalLabel">Weather in '+ $("#city").val() + ' on ' + time_month_get(json_response.daily.data[j].time) +'</h4>';
+                                                                seven_days +=        '</div>';
+                                                                seven_days +=        '<div class="modal-body">';
+                                                                seven_days +=              '<center>' + image_sevendaysModal + '<br><span style="font-size: 30px;">' + get_time(json_response.daily.data[j].time) + ': <span style="color: FFA500;">' + json_response.daily.data[j].summary + '</span></span></center>';
+                                                                seven_days +=      '<div class="row">';
+                                                                seven_days +=              '<center>';
+                                                                seven_days +=                      '<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">';
+                                                                seven_days +=                              '<span style="font-size: 20px;"><b> Sunrise Time </b></span><br><span>' + format_time(json_response.daily.data[j].sunriseTime) + '</span>';
+                                                                seven_days +=                      '</div>';
+                                                                seven_days +=                      '<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">';
+                                                                seven_days +=                              '<span style="font-size: 20px;"><b> Sunset Time </b></span><br><span>' + format_time(json_response.daily.data[j].sunsetTime) + '</span>';
+                                                                seven_days +=                      '</div>';
+                                                                seven_days +=                      '<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">';
+                                                                seven_days +=                              '<span style="font-size: 20px;"><b> Humidity </b></span><br><span>' + Math.round(json_response.daily.data[j].humidity * 100) + '%</span>';
+                                                                seven_days +=                      '</div>';
+                                                                seven_days +=              '</center>';
+                                                                seven_days +=              '</div>';
+                                                                seven_days +=              '<div class="row">';
+                                                                seven_days +=              '<center>';
+                                                                seven_days +=                      '<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">';
+                                                                seven_days +=                              '<span style="font-size: 20px;"><b> Wind Speed </b></span><br><span>' + (json_response.daily.data[j].windSpeed).toFixed(2) + 'm/s</span>';
+                                                                seven_days +=                      '</div>';
+                                                                seven_days +=                      '<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">';
+                                                                seven_days +=                              '<span style="font-size: 20px;"><b> Visibility </b></span><br><span>' + visibility7Days + '</span>';
+                                                                seven_days +=                      '</div>';
+                                                                seven_days +=                      '<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">';
+                                                                seven_days +=                              '<span style="font-size: 20px;"><b> Pressure </b></span><br><span>' + json_response.daily.data[j].pressure + 'pa</span>';
+                                                                seven_days +=                      '</div>';
+                                                                seven_days +=              '</center>';
+                                                                seven_days +=              '</div>';
+                                                                seven_days +=        '</div>';
+                                                                seven_days +=        '<div class="modal-footer">';
+                                                                seven_days +=              '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>';
+                                                                seven_days +=        '</div>';
+                                                                seven_days +=      '</div>';
+                                                                seven_days +=   '</div>';
+                                                                seven_days += '</div>';
+                                                        }
+                                                        seven_days += '<div class="col-xs-12 col-sm-12 col-md-1 col-lg-1"></div><div class="col-xs-12 col-sm-12 col-md-1 col-lg-1"></div><div class="col-xs-12 col-sm-12 col-md-1 col-lg-1"></div>';
+                                                        $('#seven_days').html(seven_days);
+                                                }
+
+                                                tab_active();
+                                        },
+                                        error: function(){
+
+                                        }
+                                });
+
+}
+
+
+
+
+
+                           });
+
+
+
+
+
+
+/* Convert the timestamp to get Time */
+                function format_time(dateTime){
+                        //multiply by 1000 to convert the unix timestamp to milliseconds
+                        var date = new Date(dateTime * 1000);
+                        if (date.getHours()>=12){
+                                var hour = parseInt(date.getHours()) - 12;
+                                hour = (hour == '0' ? 12 : hour);
+                                var amPm = "PM";
+                        } else {
+                                var hour = date.getHours();
+                                hour = (hour == '0' ? 12 : hour);
+                                var amPm = "AM";
+                        }
+                        var time = (hour < 10 ? '0'+hour : hour)   + ":" + (date.getMinutes() < 10 ? '0'+ date.getMinutes() : date.getMinutes()) + " " + amPm;
+                        console.log(time);
+                        return time;
+                }
+
+
+function createMap(lat, lon){
+                        //Center of map
+                        var map = new OpenLayers.Map("location_map");
+                        var fromProjection = new OpenLayers.Projection("EPSG:4326");   // Transform from WGS 1984
+                        var toProjection   = new OpenLayers.Projection("EPSG:900913"); // to Spherical Mercator Projection
+                        var position       = new OpenLayers.LonLat(lon, lat).transform( fromProjection, toProjection);
+                        // Create overlays
+                        //  OSM
+                        var mapnik = new OpenLayers.Layer.OSM();
+                        var layer_cloud = new OpenLayers.Layer.XYZ(
+                                                                "clouds",
+                                                                "http://${s}.tile.openweathermap.org/map/clouds/${z}/${x}/${y}.png",
+                                                                {
+                                                                        isBaseLayer: false,
+                                                                        opacity: 0.7,
+                                                                        sphericalMercator: true
+                                                                }
+                                                        );
+                        var layer_precipitation = new OpenLayers.Layer.XYZ(
+                                "precipitation",
+                                "http://${s}.tile.openweathermap.org/map/precipitation/${z}/${x}/${y}.png",
+                                {
+                                        isBaseLayer: false,
+                                        opacity: 0.7,
+                                        sphericalMercator: true
+                                }
+                        );
+                        map.addLayers([mapnik, layer_precipitation, layer_cloud]);
+                        map.setCenter( position, 8 );
+                }
+
+/* Convert the timestamp to get the Day */
+                function get_time(dateTime) {
+                        var d = new Date(dateTime * 1000);
+                        var day = new Array(7);
+                        day[0] = "Sunday";
+                        day[1] = "Monday";
+                        day[2] = "Tuesday";
+                        day[3] = "Wednesday";
+                        day[4] = "Thursday";
+                        day[5] = "Friday";
+                        day[6] = "Saturday";
+
+                        var n = day[d.getDay()];
+                        return n;
+                }
+
+                  /* Activating the nav tabs */
+                function tab_active() {
+                        $('#nav_tabs a[href="#tab1"]').click(function (e) {
+                                        $('#nav_tabs a[href="#tab1"]').tab('show');
+                        });
+
+                        $('#nav_tabs a[href="#tab2"]').click(function (e) {
+                                        $('#nav_tabs a[href="#tab2"]').tab('show');
+                        });
+
+                        $('#nav_tabs a[href="#tab3"]').click(function (e) {
+                                        $('#nav_tabs a[href="#tab3"]').tab('show');
+                        });
+                }
+
+
+
+
+
+                /* Convert the timestamp to get the month and day/date */
+                function time_month_get(dateTime) {
+                        var d = new Date(dateTime * 1000);
+                        var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                        var date = d.getDate();
+
+                        return monthNames[d.getMonth()] + " " + date;
+                }
+
+
+              
+
+
+
+});
+
+
+function clearscreen(){
+
+    document.getElementById("displaytab").innerHTML="";
+}
+        
+        
+        
+        
+
+
+
+
+
+
+
+    </script>
+    <script>
+var address;
+var weather_image;
+var current_summary;
+var temp;
+var temp_unit;
+var degree;
+//fb start
+	
+    
+//	window.fbAsyncInit = function() {
+//		FB.init({
+//			appId      : '1648894355368560',
+//			xfbml      : true,
+//			version    : 'v2.5',
+//		});
+//	};
+
+	(function(d, s, id){
+		var js, fjs = d.getElementsByTagName(s)[0];
+		if (d.getElementById(id)) {return;}
+		js = d.createElement(s); js.id = id;
+//		js.src = "https://connect.facebook.net/en_US/sdk.js";
+        js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.5&appId=1648894355368560"
+
+		fjs.parentNode.insertBefore(js, fjs);
+	}(document, 'script', 'facebook-jssdk'));
+	
+	function fb_post()){	
+		FB.login(function(response){
+			if (response.authResponse){
+				FB.ui({
+         
+					method: 'feed',
+					name: "Current Weather in " + address,
+					link: "http://www.forecast.io",
+					description: current_summary + ", " + temp + temp_unit,
+					picture: weather_image,
+					caption: "WEATHER INFORMATION FROM FORECAST IO ",
+					display: "popup"
+       
+				},function(response){ if(response && response.post_id){alert("Posted Successfully");} });
+			}
+			else{
+				alert('Not posted');
+			}
+		});
+	} 
+    </script>
+    
+    
+    
+    
+</head>
+<body style="background: url('http://cs-server.usc.edu:45678/hw/hw8/images/bg.jpg'); background-size: cover; background-repeat: no-repeat; height: block;">
+
+<div id="fb-root"></div>
+                <script>(function(d, s, id) {
+                  var js, fjs = d.getElementsByTagName(s)[0];
+                  if (d.getElementById(id)) return;
+                  js = d.createElement(s); js.id = id;
+                  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.5&appId=582986281852835";
+                  fjs.parentNode.insertBefore(js, fjs);
+                }(document, 'script', 'facebook-jssdk'));</script>
+
+                <div class="fb-share-button" data-href="https://forecast.io/" data-layout="icon"></div>
+
+
+   <div id="bootstrap"></div>
+    <div class="container">
+        <div class="title text-center">
+                        <h1>Forecast Search</h1>
+                </div>
+<div class="trans">
+            <div class="row">
+                <section class="col-xs-12">
+
+                    <form name="weather" id="weather" method="post">
+
+                        <div class="form-group">
+                            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+                                <label class="control-label" for="address" id="label">Street Address:<span id="ast">*</span></label>
+                                <input type="text" class="form-control" id="address" name="address" placeholder="Enter street address">
+                                <p class="err" id="strerr"></p>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
+                                <label class="control-label" for="city" id="label">City:<span id="ast">*</span></label>
+                                <input type="text" class="form-control" id="city" name="city" placeholder="Enter the city name">
+                                <p id="cityerr" class="err"></p>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
+                                <label class="control-label" for="state" id="label">State:<span id="ast">*</span></label>
+                                <select class="form-control" id="state" name="state">
+                                    <option value="blank">Select your state...</option>
+                                    <option value="AB">Albama</option>
+                                    <option value="AK">Alaska</option>
+                                    <option value="AZ">Arizona</option>
+                                    <option value="AR">Arkansas</option>
+                                    <option value="CA">California</option>
+                                    <option value="CO">Colorado</option>
+                                    <option value="CT">Connecticut</option>
+                                    <option value="DE">Delaware</option>
+                                    <option value="DC">District Of Columbia</option>
+                                    <option value="FL">Florida</option>
+                                    <option value="GA">Georgia</option>
+                                    <option value="HI">Hawaii</option>
+                                    <option value="ID">Idaho</option>
+                                    <option value="IL">Illinois</option>
+                                    <option value="IN">Indiana</option>
+                                    <option value="IA">Iowa</option>
+                                    <option value="KS">Kansas</option>
+                                    <option value="KY">Kentucky</option>
+                                    <option value="LA">Louisiana</option>
+                                    <option value="ME">Maine</option>
+                                    <option value="MD">Maryland</option>
+                                    <option value="MA">Massachusetts</option>
+                                    <option value="MI">Michigan</option>
+                                    <option value="MN">Minnesota</option>
+                                    <option value="MS">Mississippi</option>
+                                    <option value="MO">Missouri</option>
+                                    <option value="MT">Montana</option>
+                                    <option value="NE">Nebraska</option>
+                                    <option value="NV">Nevada</option>
+                                    <option value="NH">New Hampshire</option>
+                                    <option value="NJ">New Jersey</option>
+                                    <option value="NM">New Mexico</option>
+                                    <option value="NY">New York</option>
+                                    <option value="NC">North Carolina</option>
+                                    <option value="ND">North Dakota</option>
+                                    <option value="OH">Ohio</option>
+                                    <option value="OK">Oklahoma</option>
+                                    <option value="OR">Oregon</option>
+                                    <option value="PA">Pennsylvania</option>
+                                    <option value="RI">Rhode Island</option>
+                                    <option value="SC">South Carolina</option>
+                                    <option value="SD">South Dakota</option>
+                                    <option value="TN">Tennessee</option>
+                                    <option value="TX">Texas</option>
+                                    <option value="UT">Utah</option>
+                                    <option value="VT">Vermont</option>
+                                    <option value="VA">Virginia</option>
+                                    <option value="WA">Washington</option>
+                                    <option value="WV">West Virginia</option>
+                                    <option value="WI">Wisconsin</option>
+                                    <option value="WY">Wyoming</option>
+                                </select>
+                                <p id="stateerr" class="err"></p>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-xs-12 col-sm-12 col-md-2 col-lg-3">
+                                <label class="control-label" id="label">Degree:<span id="ast">*</span></label>
+                                <div class="form-group">
+                                    <label class="radio-inline" id="label">
+                                        <input type="radio" id="degree" name="degree" value="Fahrenheit" checked="true">Fahrenheit
+                                    </label>
+                                    <label class="radio-inline" id="label">
+                                        <input type="radio" id="degree" name="degree" value="Celsius">Celsius
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                   <div class="col-xs-12 col-sm-12 col-md-3 col-lg-1">
+                                 <label class="control-label" for="city" id="label"></label>
+                                <input type="hidden" class="form-control" id="city" name="city"></div>
+                            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-2 " style="text-align: right">
+                                <button type="button" class="btn btn-primary btn-sm" id="search" name="search">
+                                    <span class="glyphicon glyphicon-search"></span> Search
+                                </button>
+                                <button type="button" class="btn btn-default btn-sm" id="reset" name="reset" >
+                                    <span class="glyphicon glyphicon-refresh"></span> Clear
+                                </button>
+<br>
+                                <label class="control-label" id="label">Powered By:</label>
+                                 <a href="http://forecast.io"><img src="http://cs-server.usc.edu:45678/hw/hw8/images/forecast_logo.png" alt="Forecast I/O" style="width:70px;height:70px;border:0"></a>
+                            </div>
+                        </div>
+
+                    </form>
+ </section>
+
+                   </div>
+        </div><!-- row -->
+
+<div id="displaytab">
+    <hr width="90%" color="white">
+      
+                                <ul class="nav nav-tabs" id="nav_tabs">
+                                        <li role="presentation" class="active"><a href="#tab1">Right Now</a></li>
+                                        <li role="presentation"><a href="#tab2">Next 24 Hours</a></li>
+                                        <li role="presentation"><a href="#tab3">Next 7 Days</a></li>
+                                </ul>
+<!-- Tab panes -->
+                                <div class="tab-content">
+                                        <div role="tabpanel" class="tab-pane active " id="tab1">
+                                               
+                                                        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6" id="current_display">
+                                                        </div>
+                                                        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6" id="current_map">
+
+                                                          <div id="location_map">
+                                                                </div>
+
+                                                        </div>
+                                                </div>
+                                        </div>
+                                        <div role="tabpanel" class="tab-pane" id="tab2">
+                                        
+                                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="tab2Visual">
+                                                                
+                                                        </div>
+                                                </div>
+                                        </div>
+                                        <div role="tabpanel" class="tab-pane" id="tab3">
+                                                <div class="row" id="seven_days" style="background: #2F3439;">
+
+                                                </div>
+                                        </div>
+                                </div>
+                        </div>
+
+ </div>
+  </div>
+<noscript>
+</body>
+</html>
